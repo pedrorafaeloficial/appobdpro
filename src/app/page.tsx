@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import type { DiagnosticDataOutput, DiagnosticDataInput } from '@/ai/flows/analyze-diagnostic-data';
-import LandingPage from '@/components/landing-page';
 import DiagnosticForm from '@/components/diagnostic-form';
 import ResultsDashboard from '@/components/results-dashboard';
 import Logo from '@/components/logo';
+import LoginForm from '@/components/login-form';
+import { useUser } from '@/firebase';
+import { Loader2 } from 'lucide-react';
 
-type Step = 'landing' | 'form' | 'results';
+type Step = 'form' | 'results';
 
 // Combine analysis result with the input that generated it
 export type AnalysisResultWithInput = DiagnosticDataOutput & {
@@ -15,12 +17,9 @@ export type AnalysisResultWithInput = DiagnosticDataOutput & {
 };
 
 export default function Home() {
-  const [step, setStep] = useState<Step>('landing');
+  const [step, setStep] = useState<Step>('form');
   const [analysisResult, setAnalysisResult] = useState<AnalysisResultWithInput | null>(null);
-
-  const handleStart = () => {
-    setStep('form');
-  };
+  const { user, isUserLoading } = useUser();
 
   const handleAnalysisComplete = (result: DiagnosticDataOutput, input: DiagnosticDataInput) => {
     setAnalysisResult({ ...result, input });
@@ -29,18 +28,24 @@ export default function Home() {
 
   const handleStartOver = () => {
     setAnalysisResult(null);
-    setStep('landing');
+    setStep('form');
   };
 
-  const renderStep = () => {
+  const renderContent = () => {
+    if (isUserLoading) {
+      return <Loader2 className="h-12 w-12 animate-spin text-primary" />;
+    }
+
+    if (!user) {
+      return <LoginForm />;
+    }
+
     switch (step) {
-      case 'form':
-        return <DiagnosticForm onAnalysisComplete={handleAnalysisComplete} />;
       case 'results':
         return analysisResult && <ResultsDashboard analysisResult={analysisResult} onStartOver={handleStartOver} />;
-      case 'landing':
+      case 'form':
       default:
-        return <LandingPage onStart={handleStart} />;
+        return <DiagnosticForm onAnalysisComplete={handleAnalysisComplete} />;
     }
   };
 
@@ -51,7 +56,7 @@ export default function Home() {
         <Logo />
       </div>
       <div className="relative z-10 w-full flex items-center justify-center">
-        {renderStep()}
+        {renderContent()}
       </div>
     </div>
   );
