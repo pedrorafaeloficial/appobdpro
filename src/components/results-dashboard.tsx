@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, LabelList } from 'recharts';
-import { AlertTriangle, FileText, Loader2, Printer, RotateCcw } from 'lucide-react';
+import { AlertTriangle, FileText, Loader2, RotateCcw, Wrench } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from './ui/scroll-area';
 import type { AnalysisResultWithInput } from '@/app/page';
@@ -72,13 +72,31 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
   return (
     <div className="w-full max-w-7xl mx-auto animate-fade-in printable-area">
       <div className="flex flex-wrap justify-between items-center gap-4 mb-8 non-printable">
-        <h2 className="text-3xl font-bold">Resultados do Diagnóstico</h2>
+        <h2 className="text-3xl font-bold">Principais Avarias encontradas!</h2>
         <div className="flex gap-2">
+           <Dialog open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen}>
+            <DialogTrigger asChild>
+                <Button size="lg" onClick={handleGenerateReport} disabled={isGeneratingReport}>
+                    {isGeneratingReport ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wrench className="mr-2 h-4 w-4" />}
+                    {isGeneratingReport ? 'Gerando Solução...' : (fullReport ? 'Ver Solução' : 'Remover Avarias agora')}
+                </Button>
+            </DialogTrigger>
+            {fullReport && (
+              <DialogContent className="max-w-4xl h-[90vh] printable-dialog-content">
+                <DialogHeader>
+                  <DialogTitle>Relatório de Diagnóstico Completo</DialogTitle>
+                  <DialogDescription>
+                    Aqui está seu relatório detalhado com recomendações personalizadas.
+                  </DialogDescription>
+                </DialogHeader>
+                <ScrollArea className="h-full w-full rounded-md border p-4 mt-4">
+                  <pre className="whitespace-pre-wrap font-body text-sm">{fullReport.report}</pre>
+                </ScrollArea>
+              </DialogContent>
+            )}
+          </Dialog>
           <Button variant="outline" onClick={onStartOver}>
             <RotateCcw className="mr-2 h-4 w-4" /> Começar de Novo
-          </Button>
-          <Button onClick={handlePrint} disabled={!fullReport}>
-            <Printer className="mr-2 h-4 w-4" /> Imprimir Relatório
           </Button>
         </div>
       </div>
@@ -134,29 +152,6 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
                </ScrollArea>
             </CardContent>
           </Card>
-
-          <Dialog open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="lg" className="w-full" onClick={handleGenerateReport} disabled={isGeneratingReport}>
-                {isGeneratingReport ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
-                {isGeneratingReport ? 'Gerando...' : (fullReport ? 'Ver Relatório Completo' : 'Gerar Relatório Completo')}
-              </Button>
-            </DialogTrigger>
-            {fullReport && (
-              <DialogContent className="max-w-4xl h-[90vh] printable-dialog-content">
-                <DialogHeader>
-                  <DialogTitle>Relatório de Diagnóstico Completo</DialogTitle>
-                  <DialogDescription>
-                    Aqui está seu relatório detalhado com recomendações personalizadas.
-                  </DialogDescription>
-                </DialogHeader>
-                <ScrollArea className="h-full w-full rounded-md border p-4 mt-4">
-                  <pre className="whitespace-pre-wrap font-body text-sm">{fullReport.report}</pre>
-                </ScrollArea>
-              </DialogContent>
-            )}
-          </Dialog>
-
         </div>
       </div>
       
