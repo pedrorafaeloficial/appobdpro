@@ -59,6 +59,7 @@ export default function Home() {
         quality={80}
         className="object-contain -z-10 opacity-20"
         data-ai-hint="automotive scanner"
+        unoptimized
       />
       <div className="scanline-effect fixed inset-0 pointer-events-none z-0" />
       <div className="absolute top-6 left-6 md:top-8 md:left-8 z-10">
