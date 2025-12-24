@@ -51,7 +51,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen w-full flex-col items-center justify-center p-4 md:p-8">
+    <div className="flex min-h-screen w-full flex-col items-center justify-start py-24 px-4 md:px-8">
        <Image
         src="https://sites-wp-obdpro.vlxcg6.easypanel.host/wp-content/uploads/2025/12/obd-pro.png"
         alt="Automotive scanner background"
