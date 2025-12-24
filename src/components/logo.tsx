@@ -1,10 +1,15 @@
+import Image from 'next/image';
 import type { FC } from 'react';
 
 const Logo: FC = () => {
   return (
-    <h1 className="text-2xl font-bold text-primary flicker tracking-widest uppercase select-none">
-      OBD-Pro
-    </h1>
+    <Image
+      src="https://sites-wp-obdpro.vlxcg6.easypanel.host/wp-content/uploads/2025/12/OBD-pro-Branco.png"
+      alt="OBD-Pro Logo"
+      width={150}
+      height={35}
+      priority
+    />
   );
 };
 

@@ -28,6 +28,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'sites-wp-obdpro.vlxcg6.easypanel.host',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
