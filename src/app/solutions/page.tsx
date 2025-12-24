@@ -10,8 +10,29 @@ import { Check, CheckCircle2, ChevronRight, Circle, Star, Zap } from 'lucide-rea
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import Logo from '@/components/logo';
+import { Input } from '@/components/ui/input';
 
 type RecommendationItem = PersonalizedRecommendationsOutput['recommendations'][0];
+
+const WhatsAppIcon = () => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+    >
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+      <path d="m15 12-3 3-3-3" />
+      <path d="m12 15-3-3" />
+    </svg>
+  );
+  
 
 function SolutionSkeleton() {
   return (
@@ -41,6 +62,7 @@ function SolutionSkeleton() {
 export default function SolutionsPage() {
   const [report, setReport] = useState<PersonalizedRecommendationsOutput | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [whatsAppNumber, setWhatsAppNumber] = useState('');
   const router = useRouter();
   const { toast } = useToast();
 
@@ -79,6 +101,39 @@ export default function SolutionsPage() {
 
     fetchReport();
   }, [router, toast]);
+  
+  const handleSendToWhatsApp = () => {
+    if (!report || !report.recommendations) return;
+    if (!whatsAppNumber.match(/^\d{10,13}$/)) {
+        toast({
+          variant: 'destructive',
+          title: 'Número inválido',
+          description: 'Por favor, insira um número de WhatsApp válido (ex: 5511999998888).',
+        });
+        return;
+      }
+  
+    let message = `*Checklist de Soluções OBD-Pro*\n\n`;
+    message += `Aqui estão os passos recomendados para impulsionar sua oficina:\n\n`;
+  
+    report.recommendations.forEach((item) => {
+      message += `*-----------------------------------*\n`;
+      message += `*${item.code}: ${item.title}*\n\n`;
+      message += `*Plano de Ação:*\n`;
+      item.solution.forEach((sol) => {
+        message += ` - ${sol.step}\n`;
+      });
+      message += `\n*Módulo Recomendado:* ${item.module}\n`;
+    });
+    
+    message += `\n*-----------------------------------*\n`;
+    message += `Evolua sua oficina com a Comunidade OBD-Pro! Acesse treinamentos, ferramentas e networking para transformar seu negócio.`;
+  
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${whatsAppNumber}?text=${encodedMessage}`;
+  
+    window.open(whatsappUrl, '_blank');
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -129,9 +184,26 @@ export default function SolutionsPage() {
           </div>
         )}
 
-        <section className="mt-20 text-center">
-            <h2 className="text-3xl font-bold mb-4">Evolua sua Oficina com a Comunidade OBD-Pro</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto mb-12">
+        <section className="mt-20">
+            <div className="bg-card border border-primary/20 rounded-lg p-8 mb-20 text-center">
+                <h3 className="text-2xl font-bold text-green-500 mb-4">Enviar esse Checklist para seu WhatsApp</h3>
+                <div className="max-w-lg mx-auto flex flex-col sm:flex-row gap-4">
+                    <Input 
+                        type="tel"
+                        placeholder="Seu número com DDD (ex: 11999998888)"
+                        value={whatsAppNumber}
+                        onChange={(e) => setWhatsAppNumber(e.target.value)}
+                        className="text-center sm:text-left"
+                    />
+                    <Button onClick={handleSendToWhatsApp} size="lg" className="bg-green-600 hover:bg-green-700 text-white shrink-0">
+                        <WhatsAppIcon />
+                        Enviar Checklist
+                    </Button>
+                </div>
+            </div>
+
+            <h2 className="text-3xl font-bold text-center mb-4">Evolua sua Oficina com a Comunidade OBD-Pro</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-center mb-12">
                 Tenha acesso a um ecossistema completo com treinamentos, ferramentas e networking para transformar a gestão do seu negócio.
             </p>
 
