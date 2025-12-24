@@ -161,6 +161,7 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
     if (isValid) {
       if (currentStepIndex < steps.length - 1) {
         setCurrentStep(steps[currentStepIndex + 1]);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         await onSubmit(form.getValues());
       }
@@ -170,6 +171,7 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
   const handleBack = () => {
     if (currentStepIndex > 0) {
       setCurrentStep(steps[currentStepIndex - 1]);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
