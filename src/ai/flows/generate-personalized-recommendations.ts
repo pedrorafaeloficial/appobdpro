@@ -1,9 +1,9 @@
 'use server';
 
 /**
- * @fileOverview Gera recomendações personalizadas com base nos dados de diagnóstico.
+ * @fileOverview Gera um checklist de soluções personalizadas com base nos dados de diagnóstico.
  *
- * - generatePersonalizedRecommendations - Uma função que gera recomendações personalizadas.
+ * - generatePersonalizedRecommendations - Uma função que gera um checklist de soluções.
  * - PersonalizedRecommendationsInput - O tipo de entrada para a função generatePersonalizedRecommendations.
  * - PersonalizedRecommendationsOutput - O tipo de retorno para a função generatePersonalizedRecommendations.
  */
@@ -21,8 +21,19 @@ const PersonalizedRecommendationsInputSchema = z.object({
 
 export type PersonalizedRecommendationsInput = z.infer<typeof PersonalizedRecommendationsInputSchema>;
 
+const SolutionStepSchema = z.object({
+  step: z.string().describe("Um passo curto e acionável que o dono da oficina precisa aprender ou fazer."),
+});
+
+const RecommendationItemSchema = z.object({
+  code: z.string().describe("O código de erro no formato DTC-[ÁREA]-[CÓDIGO_NUMÉRICO] (ex: DTC-OPE-001)."),
+  title: z.string().describe("O título do problema de forma clara e direta."),
+  solution: z.array(SolutionStepSchema).describe("Uma lista de 3 a 4 passos curtos e acionáveis para resolver o problema."),
+  module: z.string().describe("O nome de um módulo fictício na comunidade OBD-Pro para aprofundar na solução (ex: 'Gestão Financeira para Oficinas')."),
+});
+
 const PersonalizedRecommendationsOutputSchema = z.object({
-  report: z.string().describe('Um relatório completo intitulado "Principais Erros de Avaria encontrados", listando os 10 piores respostas em ordem de importância. Para cada item, forneça um código de erro, um passo a passo curto do que aprender, e a menção de que existe um módulo específico na comunidade OBD-Pro para resolver o problema.'),
+  recommendations: z.array(RecommendationItemSchema).describe("Uma lista dos 10 problemas mais críticos e urgentes, ordenados por importância."),
 });
 
 export type PersonalizedRecommendationsOutput = z.infer<typeof PersonalizedRecommendationsOutputSchema>;
@@ -36,7 +47,7 @@ const prompt = ai.definePrompt({
   input: {schema: PersonalizedRecommendationsInputSchema},
   output: {schema: PersonalizedRecommendationsOutputSchema},
   prompt: `Você é um especialista em gestão de oficinas mecânicas e criador da comunidade OBD-Pro.
-Sua tarefa é criar um relatório de diagnóstico detalhado chamado "Principais Erros de Avaria encontrados".
+Sua tarefa é criar um checklist de diagnóstico detalhado.
 
 Analise todas as respostas fornecidas pelo dono da oficina:
 Dados Operacionais: {{{operationalData}}}
@@ -47,20 +58,23 @@ DTCs Preliminares: {{{identifiedDTCs}}}
 
 Com base em todas as informações, identifique os 10 problemas mais críticos e urgentes. Ordene-os por ordem de importância para a saúde do negócio.
 
-Para cada um dos 10 pontos, siga estritamente este formato:
+Para cada um dos 10 pontos, siga estritamente o schema de saída.
 
-**DTC-[ÁREA]-[CÓDIGO_NUMÉRICO]: [Título do Problema]**
+**Código (code):**
+Gere um código no formato **DTC-[ÁREA]-[CÓDIGO_NUMÉRICO]**.
 - **ÁREA:** Use OPE (Operacional), FIN (Financeiro), GES (Gestão), MKT (Marketing).
 - **CÓDIGO_NUMÉRICO:** Use um número sequencial de 3 dígitos (001, 002, etc.).
-- **Título do Problema:** Descreva o problema de forma clara e direta.
 
-**Solução Recomendada:**
-Crie um passo a passo curto e acionável (3 a 4 passos) sobre o que o dono da oficina precisa aprender ou fazer para resolver o problema.
+**Título (title):**
+Descreva o problema de forma clara e direta.
 
-**Direcionamento para a Comunidade:**
-Conclua dizendo: "Para se aprofundar e resolver isso de vez, acesse o módulo [Nome do Módulo] na comunidade OBD-Pro." Use um nome de módulo fictício que faça sentido para o problema (ex: "Gestão Financeira para Oficinas", "Marketing Digital para Mecânicas", "Otimização de Processos Operacionais").
+**Solução (solution):**
+Crie um passo a passo curto e acionável (3 a 4 passos) sobre o que o dono da oficina precisa aprender ou fazer para resolver o problema. Cada passo deve ser um item no array.
 
-Seja direto, profissional e encorajador. O objetivo é mostrar o problema e o caminho claro para a solução dentro da sua comunidade.
+**Módulo (module):**
+Conclua com o nome de um módulo fictício da comunidade OBD-Pro que faça sentido para o problema (ex: "Gestão Financeira para Oficinas", "Marketing Digital para Mecânicas", "Otimização de Processos Operacionais").
+
+Seja direto, profissional e encorajador. O objetivo é mostrar o problema e o caminho claro para a solução dentro da sua comunidade. Responda apenas com o JSON estruturado.
 `,
 });
 

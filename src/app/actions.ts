@@ -1,7 +1,7 @@
 'use server';
 
 import { analyzeDiagnosticData, DiagnosticDataInput } from '@/ai/flows/analyze-diagnostic-data';
-import { generatePersonalizedRecommendations, PersonalizedRecommendationsInput } from '@/ai/flows/generate-personalized-recommendations';
+import { generatePersonalizedRecommendations, PersonalizedRecommendationsInput, PersonalizedRecommendationsOutput } from '@/ai/flows/generate-personalized-recommendations';
 
 export async function runAnalysis(input: DiagnosticDataInput) {
   try {
@@ -13,7 +13,7 @@ export async function runAnalysis(input: DiagnosticDataInput) {
   }
 }
 
-export async function getFullReport(input: PersonalizedRecommendationsInput) {
+export async function getFullReport(input: PersonalizedRecommendationsInput): Promise<{ success: boolean; data?: PersonalizedRecommendationsOutput; error?: string; }> {
   try {
     const result = await generatePersonalizedRecommendations(input);
     return { success: true, data: result };

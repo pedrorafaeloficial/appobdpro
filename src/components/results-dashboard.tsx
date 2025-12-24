@@ -1,12 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { getFullReport } from '@/app/actions';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, LabelList } from 'recharts';
-import { AlertTriangle, FileText, Loader2, RotateCcw, Wrench } from 'lucide-react';
+import { AlertTriangle, Loader2, RotateCcw, Wrench } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from './ui/scroll-area';
 import type { AnalysisResultWithInput } from '@/app/page';
@@ -16,14 +15,9 @@ interface ResultsDashboardProps {
   onStartOver: () => void;
 }
 
-interface FullReport {
-  report: string;
-}
-
 export default function ResultsDashboard({ analysisResult, onStartOver }: ResultsDashboardProps) {
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
-  const [fullReport, setFullReport] = useState<FullReport | null>(null);
-  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+  const router = useRouter();
   const { toast } = useToast();
 
   const chartData = [
@@ -40,61 +34,35 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
     { title: 'DTCs de Marketing', content: analysisResult.marketingDTCs },
   ];
 
-  const handleGenerateReport = async () => {
-    if (fullReport) {
-      setIsReportDialogOpen(true);
-      return;
-    }
+  const handleNavigateToSolutions = () => {
     setIsGeneratingReport(true);
-    const identifiedDTCs = diagnosticSections.map(s => `${s.title}:\n${s.content}`).join('\n\n');
-    
-    const inputForReport = { ...analysisResult.input, identifiedDTCs };
-    
-    const result = await getFullReport(inputForReport);
-    setIsGeneratingReport(false);
-
-    if (result.success && result.data) {
-      setFullReport(result.data);
-      setIsReportDialogOpen(true);
-    } else {
+    try {
+      // Store the analysis input in sessionStorage to pass it to the next page
+      const identifiedDTCs = diagnosticSections.map(s => `${s.title}:\n${s.content}`).join('\n\n');
+      const inputForReport = { ...analysisResult.input, identifiedDTCs };
+      sessionStorage.setItem('fullReportInput', JSON.stringify(inputForReport));
+      router.push('/solutions');
+    } catch (error) {
+      console.error("Failed to navigate to solutions page:", error);
       toast({
         variant: 'destructive',
-        title: 'Falha na Geração do Relatório',
-        description: result.error || 'Ocorreu um erro desconhecido.',
+        title: 'Falha ao carregar soluções',
+        description: 'Não foi possível preparar os dados para a página de soluções.',
       });
+      setIsGeneratingReport(false);
     }
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
 
   return (
     <div className="w-full max-w-7xl mx-auto animate-fade-in printable-area">
       <div className="flex flex-wrap justify-between items-center gap-4 mb-8 non-printable">
         <h2 className="text-3xl font-bold">Principais Avarias encontradas!</h2>
         <div className="flex gap-2">
-           <Dialog open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen}>
-            <DialogTrigger asChild>
-                <Button size="lg" onClick={handleGenerateReport} disabled={isGeneratingReport}>
-                    {isGeneratingReport ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wrench className="mr-2 h-4 w-4" />}
-                    {isGeneratingReport ? 'Gerando Solução...' : (fullReport ? 'Ver Solução' : 'Remover Avarias agora')}
-                </Button>
-            </DialogTrigger>
-            {fullReport && (
-              <DialogContent className="max-w-4xl h-[90vh] printable-dialog-content">
-                <DialogHeader>
-                  <DialogTitle>Relatório de Diagnóstico Completo</DialogTitle>
-                  <DialogDescription>
-                    Aqui está seu relatório detalhado com recomendações personalizadas.
-                  </DialogDescription>
-                </DialogHeader>
-                <ScrollArea className="h-full w-full rounded-md border p-4 mt-4">
-                  <pre className="whitespace-pre-wrap font-body text-sm">{fullReport.report}</pre>
-                </ScrollArea>
-              </DialogContent>
-            )}
-          </Dialog>
+            <Button size="lg" onClick={handleNavigateToSolutions} disabled={isGeneratingReport}>
+                {isGeneratingReport ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wrench className="mr-2 h-4 w-4" />}
+                {isGeneratingReport ? 'Carregando Soluções...' : 'Remover Avarias agora'}
+            </Button>
           <Button variant="outline" onClick={onStartOver}>
             <RotateCcw className="mr-2 h-4 w-4" /> Começar de Novo
           </Button>
@@ -154,42 +122,6 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
           </Card>
         </div>
       </div>
-      
-      <style jsx global>{`
-        @media print {
-          body * {
-            visibility: hidden;
-          }
-          .printable-dialog-content, .printable-dialog-content * {
-            visibility: visible;
-          }
-          .printable-dialog-content {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            max-width: 100% !important;
-            max-height: 100% !important;
-            border: none !important;
-            box-shadow: none !important;
-            background: white !important;
-          }
-          .non-printable {
-            display: none !important;
-          }
-           body, .printable-dialog-content {
-            background-color: white !important;
-            color: black !important;
-          }
-           .printable-dialog-content pre, .printable-dialog-content p, .printable-dialog-content .dialog-description {
-            color: #333 !important;
-          }
-           .printable-dialog-content h1, .printable-dialog-content h2, .printable-dialog-content h3, .printable-dialog-content .dialog-title {
-            color: black !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }
