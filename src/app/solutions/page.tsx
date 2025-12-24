@@ -164,7 +164,7 @@ export default function SolutionsPage() {
                     <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-xs font-bold rounded-bl-lg">MAIS POPULAR</div>
                     <CardHeader className="pb-4">
                         <CardTitle className="text-2xl">Plano Anual</CardTitle>
-                        <CardDescription>O melhor custo-benefício para sua evolução.</CardDescription>
+                        <CardDescription>O melhor custo-benefício. Leve 2 meses grátis!</CardDescription>
                     </CardHeader>
                     <CardContent className="text-left space-y-4">
                         <p className="text-4xl font-bold">R$ 697,00<span className="text-lg font-normal text-muted-foreground">/ano</span></p>
