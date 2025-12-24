@@ -22,7 +22,7 @@ const PersonalizedRecommendationsInputSchema = z.object({
 export type PersonalizedRecommendationsInput = z.infer<typeof PersonalizedRecommendationsInputSchema>;
 
 const PersonalizedRecommendationsOutputSchema = z.object({
-  report: z.string().describe('Um relatório completo intitulado "Principais Erros de Avaria encontrados", listando as 15 piores respostas em ordem de importância. Para cada item, forneça um passo a passo curto do que aprender, mencionando que existe um módulo específico na comunidade OBD-Pro para resolver o problema.'),
+  report: z.string().describe('Um relatório completo intitulado "Principais Erros de Avaria encontrados", listando os 10 piores respostas em ordem de importância. Para cada item, forneça um código de erro, um passo a passo curto do que aprender, e a menção de que existe um módulo específico na comunidade OBD-Pro para resolver o problema.'),
 });
 
 export type PersonalizedRecommendationsOutput = z.infer<typeof PersonalizedRecommendationsOutputSchema>;
@@ -36,24 +36,32 @@ const prompt = ai.definePrompt({
   input: {schema: PersonalizedRecommendationsInputSchema},
   output: {schema: PersonalizedRecommendationsOutputSchema},
   prompt: `Você é um especialista em gestão de oficinas mecânicas e criador da comunidade OBD-Pro.
-  Sua tarefa é criar um relatório de diagnóstico chamado "Principais Erros de Avaria encontrados".
+Sua tarefa é criar um relatório de diagnóstico detalhado chamado "Principais Erros de Avaria encontrados".
 
-  Analise todas as respostas fornecidas pelo dono da oficina:
-  Dados Operacionais: {{{operationalData}}}
-  Dados de Gestão: {{{gestaoData}}}
-  Dados Financeiros: {{{financeiroData}}}
-  Dados de Marketing: {{{marketingData}}}
-  DTCs Preliminares: {{{identifiedDTCs}}}
+Analise todas as respostas fornecidas pelo dono da oficina:
+Dados Operacionais: {{{operationalData}}}
+Dados de Gestão: {{{gestaoData}}}
+Dados Financeiros: {{{financeiroData}}}
+Dados de Marketing: {{{marketingData}}}
+DTCs Preliminares: {{{identifiedDTCs}}}
 
-  Com base em todas as informações, identifique as 15 respostas que indicam os problemas mais críticos e urgentes. Ordene-os por ordem de importância para a saúde do negócio.
+Com base em todas as informações, identifique os 10 problemas mais críticos e urgentes. Ordene-os por ordem de importância para a saúde do negócio.
 
-  Para cada um dos 15 pontos, siga estritamente este formato:
-  1.  **Título do Problema:** Descreva o problema de forma clara e direta.
-  2.  **Passos para Resolver:** Crie um passo a passo curto e acionável (3 a 4 passos) sobre o que o dono da oficina precisa aprender ou fazer.
-  3.  **Direcionamento:** Conclua dizendo: "Para se aprofundar e resolver isso de vez, acesse o módulo [Nome do Módulo] na comunidade OBD-Pro." Use um nome de módulo fictício que faça sentido para o problema (ex: "Gestão Financeira para Oficinas", "Marketing Digital para Mecânicas", "Otimização de Processos Operacionais").
+Para cada um dos 10 pontos, siga estritamente este formato:
 
-  Seja direto, profissional e encorajador. O objetivo é mostrar o problema e o caminho claro para a solução dentro da sua comunidade.
-  `,
+**DTC-[ÁREA]-[CÓDIGO_NUMÉRICO]: [Título do Problema]**
+- **ÁREA:** Use OPE (Operacional), FIN (Financeiro), GES (Gestão), MKT (Marketing).
+- **CÓDIGO_NUMÉRICO:** Use um número sequencial de 3 dígitos (001, 002, etc.).
+- **Título do Problema:** Descreva o problema de forma clara e direta.
+
+**Solução Recomendada:**
+Crie um passo a passo curto e acionável (3 a 4 passos) sobre o que o dono da oficina precisa aprender ou fazer para resolver o problema.
+
+**Direcionamento para a Comunidade:**
+Conclua dizendo: "Para se aprofundar e resolver isso de vez, acesse o módulo [Nome do Módulo] na comunidade OBD-Pro." Use um nome de módulo fictício que faça sentido para o problema (ex: "Gestão Financeira para Oficinas", "Marketing Digital para Mecânicas", "Otimização de Processos Operacionais").
+
+Seja direto, profissional e encorajador. O objetivo é mostrar o problema e o caminho claro para a solução dentro da sua comunidade.
+`,
 });
 
 const generatePersonalizedRecommendationsFlow = ai.defineFlow(

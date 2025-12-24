@@ -23,6 +23,7 @@ interface FullReport {
 export default function ResultsDashboard({ analysisResult, onStartOver }: ResultsDashboardProps) {
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [fullReport, setFullReport] = useState<FullReport | null>(null);
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const chartData = [
@@ -40,7 +41,10 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
   ];
 
   const handleGenerateReport = async () => {
-    if (fullReport) return;
+    if (fullReport) {
+      setIsReportDialogOpen(true);
+      return;
+    }
     setIsGeneratingReport(true);
     const identifiedDTCs = diagnosticSections.map(s => `${s.title}:\n${s.content}`).join('\n\n');
     
@@ -51,6 +55,7 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
 
     if (result.success && result.data) {
       setFullReport(result.data);
+      setIsReportDialogOpen(true);
     } else {
       toast({
         variant: 'destructive',
@@ -130,7 +135,7 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
             </CardContent>
           </Card>
 
-          <Dialog>
+          <Dialog open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen}>
             <DialogTrigger asChild>
               <Button size="lg" className="w-full" onClick={handleGenerateReport} disabled={isGeneratingReport}>
                 {isGeneratingReport ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
