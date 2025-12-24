@@ -8,6 +8,7 @@ import Logo from '@/components/logo';
 import LoginForm from '@/components/login-form';
 import { useUser } from '@/firebase';
 import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
 
 type Step = 'form' | 'results';
 
@@ -51,6 +52,14 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen w-full flex-col items-center justify-center p-4 md:p-8">
+       <Image
+        src="https://picsum.photos/seed/obd/1920/1080"
+        alt="Automotive scanner background"
+        fill
+        quality={80}
+        className="object-cover -z-10 opacity-20"
+        data-ai-hint="automotive scanner"
+      />
       <div className="scanline-effect fixed inset-0 pointer-events-none z-0" />
       <div className="absolute top-6 left-6 md:top-8 md:left-8 z-10">
         <Logo />
