@@ -20,11 +20,11 @@ const DiagnosticDataInputSchema = z.object({
 export type DiagnosticDataInput = z.infer<typeof DiagnosticDataInputSchema>;
 
 const DiagnosticDataOutputSchema = z.object({
-  operationalDTCs: z.string().describe('Potenciais DTCs (Códigos de Erro) identificados na área operacional.'),
-  gestaoDTCs: z.string().describe('Potenciais DTCs identificados na área de gestão.'),
-  financeiroDTCs: z.string().describe('Potenciais DTCs identificados na área financeira.'),
-  marketingDTCs: z.string().describe('Potenciais DTCs identificados na área de marketing.'),
-  recommendations: z.string().describe('Recomendações personalizadas para abordar os DTCs identificados e melhorar o desempenho geral do negócio, com links para a comunidade OBD-Pro.'),
+  operationalDTCs: z.string().describe('Uma lista de até 4 DTCs (Códigos de Erro) mais críticos identificados na área operacional, formatados como uma lista de marcadores.'),
+  gestaoDTCs: z.string().describe('Uma lista de até 4 DTCs mais críticos identificados na área de gestão, formatados como uma lista de marcadores.'),
+  financeiroDTCs: z.string().describe('Uma lista de até 4 DTCs mais críticos identificados na área financeira, formatados como uma lista de marcadores.'),
+  marketingDTCs: z.string().describe('Uma lista de até 4 DTCs mais críticos identificados na área de marketing, formatados como uma lista de marcadores.'),
+  recommendations: z.string().describe('Um resumo de 2-3 frases com recomendações iniciais para os problemas mais urgentes.'),
 });
 export type DiagnosticDataOutput = z.infer<typeof DiagnosticDataOutputSchema>;
 
@@ -36,14 +36,14 @@ const prompt = ai.definePrompt({
   name: 'analyzeDiagnosticDataPrompt',
   input: {schema: DiagnosticDataInputSchema},
   output: {schema: DiagnosticDataOutputSchema},
-  prompt: `Você é um especialista em diagnósticos de negócios de IA. Analise os dados fornecidos de um formulário de diagnóstico de negócios e identifique potenciais DTCs (Códigos de Erro) em cada área (Operacional, Gestão, Financeiro e Marketing). Forneça recomendações personalizadas para resolver os DTCs identificados e melhorar o desempenho geral do negócio. Para todos os erros gerados, mostre como resolvê-los e aponte os usuários para a comunidade OBD-Pro para treinamento completo.
+  prompt: `Você é um especialista em diagnósticos de negócios para oficinas automotivas. Analise os dados do formulário de diagnóstico e, para cada área (Operacional, Gestão, Financeiro e Marketing), identifique os 4 principais DTCs (Códigos de Erro) mais críticos. Apresente cada lista de DTCs como uma lista de marcadores simples (usando "-"). Além disso, forneça um resumo de 2 a 3 frases com as recomendações mais urgentes e iniciais.
 
 Dados Operacionais: {{{operationalData}}}
 Dados de Gestão: {{{gestaoData}}}
 Dados Financeiros: {{{financeiroData}}}
 Dados de Marketing: {{{marketingData}}}
 
-Responda com potenciais DTCs e recomendações para cada uma das áreas.`,
+Responda apenas com os DTCs e as recomendações, conforme o schema de saída.`,
 });
 
 const analyzeDiagnosticDataFlow = ai.defineFlow(

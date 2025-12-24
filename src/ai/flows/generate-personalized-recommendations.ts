@@ -22,7 +22,7 @@ const PersonalizedRecommendationsInputSchema = z.object({
 export type PersonalizedRecommendationsInput = z.infer<typeof PersonalizedRecommendationsInputSchema>;
 
 const PersonalizedRecommendationsOutputSchema = z.object({
-  report: z.string().describe('Um relatório completo com recomendações personalizadas para abordar os DTCs identificados e melhorar o desempenho geral do negócio, incluindo orientação sobre como resolvê-los e links para recursos de treinamento da comunidade.'),
+  report: z.string().describe('Um relatório completo intitulado "Principais Erros de Avaria encontrados", listando as 15 piores respostas em ordem de importância. Para cada item, forneça um passo a passo curto do que aprender, mencionando que existe um módulo específico na comunidade OBD-Pro para resolver o problema.'),
 });
 
 export type PersonalizedRecommendationsOutput = z.infer<typeof PersonalizedRecommendationsOutputSchema>;
@@ -35,17 +35,24 @@ const prompt = ai.definePrompt({
   name: 'personalizedRecommendationsPrompt',
   input: {schema: PersonalizedRecommendationsInputSchema},
   output: {schema: PersonalizedRecommendationsOutputSchema},
-  prompt: `Você é um assistente de IA projetado para fornecer recomendações personalizadas a proprietários de empresas com base em dados de diagnóstico.
+  prompt: `Você é um especialista em gestão de oficinas mecânicas e criador da comunidade OBD-Pro.
+  Sua tarefa é criar um relatório de diagnóstico chamado "Principais Erros de Avaria encontrados".
 
-  Analise os seguintes dados de diagnóstico coletados do proprietário da empresa nas áreas de operacional, gestão, financeiro e marketing. Também está incluída uma lista de DTCs (Códigos de Erro) identificados em cada área.
-
+  Analise todas as respostas fornecidas pelo dono da oficina:
   Dados Operacionais: {{{operationalData}}}
   Dados de Gestão: {{{gestaoData}}}
   Dados Financeiros: {{{financeiroData}}}
   Dados de Marketing: {{{marketingData}}}
-  DTCs Identificados: {{{identifiedDTCs}}}
+  DTCs Preliminares: {{{identifiedDTCs}}}
 
-  Com base nessas informações, crie um relatório abrangente com recomendações personalizadas para resolver os DTCs identificados e melhorar o desempenho geral do negócio. Para todos os erros gerados, mostre como resolvê-los e aponte os usuários para a comunidade OBD-Pro para treinamento completo. Seja conciso e acionável.
+  Com base em todas as informações, identifique as 15 respostas que indicam os problemas mais críticos e urgentes. Ordene-os por ordem de importância para a saúde do negócio.
+
+  Para cada um dos 15 pontos, siga estritamente este formato:
+  1.  **Título do Problema:** Descreva o problema de forma clara e direta.
+  2.  **Passos para Resolver:** Crie um passo a passo curto e acionável (3 a 4 passos) sobre o que o dono da oficina precisa aprender ou fazer.
+  3.  **Direcionamento:** Conclua dizendo: "Para se aprofundar e resolver isso de vez, acesse o módulo [Nome do Módulo] na comunidade OBD-Pro." Use um nome de módulo fictício que faça sentido para o problema (ex: "Gestão Financeira para Oficinas", "Marketing Digital para Mecânicas", "Otimização de Processos Operacionais").
+
+  Seja direto, profissional e encorajador. O objetivo é mostrar o problema e o caminho claro para a solução dentro da sua comunidade.
   `,
 });
 
