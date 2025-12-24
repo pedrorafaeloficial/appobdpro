@@ -1,0 +1,234 @@
+{
+  "entities": {
+    "DiagnosticForm": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "DiagnosticForm",
+      "type": "object",
+      "description": "Represents a diagnostic form with fields for different business areas.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the DiagnosticForm entity."
+        },
+        "operationalData": {
+          "type": "string",
+          "description": "Data collected for the Operational area of the diagnostic form."
+        },
+        "gestaoData": {
+          "type": "string",
+          "description": "Data collected for the Gestão (Management) area of the diagnostic form."
+        },
+        "financeiroData": {
+          "type": "string",
+          "description": "Data collected for the Financeiro (Financial) area of the diagnostic form."
+        },
+        "marketingData": {
+          "type": "string",
+          "description": "Data collected for the Marketing area of the diagnostic form."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N DiagnosticForm)"
+        }
+      },
+      "required": [
+        "id",
+        "operationalData",
+        "gestaoData",
+        "financeiroData",
+        "marketingData",
+        "userId"
+      ]
+    },
+    "DtcAnalysis": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "DtcAnalysis",
+      "type": "object",
+      "description": "Represents the AI analysis of a diagnostic form, identifying potential DTCs.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the DtcAnalysis entity."
+        },
+        "operationalDtcs": {
+          "type": "string",
+          "description": "Identified DTCs in the Operational area."
+        },
+        "gestaoDtcs": {
+          "type": "string",
+          "description": "Identified DTCs in the Gestão (Management) area."
+        },
+        "financeiroDtcs": {
+          "type": "string",
+          "description": "Identified DTCs in the Financeiro (Financial) area."
+        },
+        "marketingDtcs": {
+          "type": "string",
+          "description": "Identified DTCs in the Marketing area."
+        },
+        "diagnosticFormId": {
+          "type": "string",
+          "description": "Reference to DiagnosticForm. (Relationship: DiagnosticForm 1:1 DtcAnalysis)"
+        }
+      },
+      "required": [
+        "id",
+        "operationalDtcs",
+        "gestaoDtcs",
+        "financeiroDtcs",
+        "marketingDtcs",
+        "diagnosticFormId"
+      ]
+    },
+    "Recommendation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Recommendation",
+      "type": "object",
+      "description": "Represents a personalized recommendation to address identified DTCs.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Recommendation entity."
+        },
+        "area": {
+          "type": "string",
+          "description": "The business area the recommendation pertains to (Operational, Gestão, Financeiro, Marketing)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the recommendation."
+        },
+        "dtcAnalysisId": {
+          "type": "string",
+          "description": "Reference to DtcAnalysis. (Relationship: DtcAnalysis 1:N Recommendation)"
+        }
+      },
+      "required": [
+        "id",
+        "area",
+        "description",
+        "dtcAnalysisId"
+      ]
+    },
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the OBD-Pro application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        }
+      },
+      "required": [
+        "id",
+        "email"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles. The `userId` path parameter corresponds to the user's UID. The userId property of the User record must match the documentId.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/diagnosticForms/{diagnosticFormId}",
+        "definition": {
+          "entityName": "DiagnosticForm",
+          "schema": {
+            "$ref": "#/backend/entities/DiagnosticForm"
+          },
+          "description": "Stores diagnostic forms associated with a user. Path-based ownership is used to restrict access. Includes 'userId' as path parameter for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "diagnosticFormId",
+              "description": "The unique identifier for the diagnostic form."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/diagnosticForms/{diagnosticFormId}/dtcAnalysis/{dtcAnalysisId}",
+        "definition": {
+          "entityName": "DtcAnalysis",
+          "schema": {
+            "$ref": "#/backend/entities/DtcAnalysis"
+          },
+          "description": "Stores DTC analysis results for a specific diagnostic form. Path-based ownership ensures only the owner can access this data. Includes 'userId' and 'diagnosticFormId' as path parameters for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "diagnosticFormId",
+              "description": "The unique identifier for the diagnostic form."
+            },
+            {
+              "name": "dtcAnalysisId",
+              "description": "The unique identifier for the DTC analysis."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/diagnosticForms/{diagnosticFormId}/dtcAnalysis/{dtcAnalysisId}/recommendations/{recommendationId}",
+        "definition": {
+          "entityName": "Recommendation",
+          "schema": {
+            "$ref": "#/backend/entities/Recommendation"
+          },
+          "description": "Stores recommendations generated from a DTC analysis. Access is restricted to the owner of the diagnostic form. Includes 'userId', 'diagnosticFormId', and 'dtcAnalysisId' as path parameters for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "diagnosticFormId",
+              "description": "The unique identifier for the diagnostic form."
+            },
+            {
+              "name": "dtcAnalysisId",
+              "description": "The unique identifier for the DTC analysis."
+            },
+            {
+              "name": "recommendationId",
+              "description": "The unique identifier for the recommendation."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to ensure Authorization Independence, Clarity of Intent, and support secure list operations (QAPs). It leverages path-based ownership for user-specific data and avoids `get()` calls in security rules by denormalizing authorization data where needed. Each collection is designed to have a homogeneous security posture, simplifying security rules. The structure also facilitates easy debugging by making authorization intent explicit through its design.\n\n- Users Collection: Stores user profiles, using the user's UID as the document ID. This collection uses the root `/users/{userId}` and is where you put the user record. The userId property of the User record must match the documentId.\n\n- DiagnosticForms Collection:  Diagnostic forms are stored under the `/users/{userId}/diagnosticForms/{diagnosticFormId}` path, which establishes clear ownership and supports secure `list` operations. The `userId` path parameter ensures that only the owning user can access their diagnostic forms.\n\n- DtcAnalysis Collection: Each diagnostic form has an associated DTC analysis. The DTC analysis results are stored under `/users/{userId}/diagnosticForms/{diagnosticFormId}/dtcAnalysis/{dtcAnalysisId}`, nested within the diagnostic form to maintain the 1:1 relationship and enforce ownership.\n\n- Recommendations Collection: Each DTC analysis generates recommendations. These are stored under `/users/{userId}/diagnosticForms/{diagnosticFormId}/dtcAnalysis/{dtcAnalysisId}/recommendations/{recommendationId}`, further nesting to maintain the relationship hierarchy and enforce ownership.\n\nThis structure enables Authorization Independence, as access to each subcollection (diagnosticForms, dtcAnalysis, recommendations) is governed by the `userId` in the path, eliminating the need for `get()` calls to parent documents. QAPs are supported by the path-based ownership, which allows secure `list` operations within each user's scope."
+  }
+}

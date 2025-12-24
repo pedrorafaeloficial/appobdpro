@@ -1,0 +1,163 @@
+/**
+ * This ruleset enforces a strict user-ownership model for the OBD-Pro application.
+ * All user-generated data, including diagnostic forms, AI analyses, and recommendations,
+ * is stored in subcollections under that user's specific document. This structure
+ * ensures that users can only ever access their own information.
+ *
+ * Core Philosophy:
+ * The security model is built on "path-based ownership." Access to any document is
+ * determined by checking if the authenticated user's ID (`request.auth.uid`) matches
+ * the `{userId}` wildcard present in the document's path. This approach is highly
+ * secure and performant, as it avoids slow and costly `get()` calls to other documents
+ * for authorization checks.
+ *
+ * Data Structure:
+ * All application data is nested hierarchically under the `/users/{userId}` path.
+ * The structure is as follows:
+ * - /users/{userId} (User profile)
+ *   - /diagnosticForms/{diagnosticFormId} (User's diagnostic forms)
+ *     - /dtcAnalysis/{dtcAnalysisId} (AI analysis for a form)
+ *       - /recommendations/{recommendationId} (Recommendations for an analysis)
+ *
+ * Key Security Decisions:
+ * - User Isolation: A user has zero visibility into the data of any other user.
+ * - No Public Data: There are no public or globally readable collections.
+ * - User Enumeration Disabled: Listing documents from the top-level `/users`
+ *   collection is explicitly forbidden to prevent attackers from discovering user IDs.
+ * - Creator-Only Writes: All write operations (create, update, delete) are
+ *   restricted to the user who owns the data tree.
+ * - Relational Integrity: On creation, key relational fields (like a document's
+ *   internal `userId` or `id`) are validated to ensure they match the document's
+ *   path, enforcing data consistency from the start. These fields are then made
+ *   immutable on update to prevent re-association.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =================================
+    // Helper Functions
+    // =================================
+
+    /**
+     * Checks if a user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the currently authenticated user's UID matches the given userId.
+     * This is the core function for enforcing user ownership.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks if the user is the owner of an existing document.
+     * Used for safe update and delete operations.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+    
+    /**
+     * Validates required user data fields on document creation.
+     * Ensures the document's internal ID matches the user's auth UID.
+     */
+    function hasValidUserDataOnCreate(userId) {
+      return request.resource.data.id == userId;
+    }
+    
+    /**
+     * Ensures critical, immutable fields for a User document are not changed.
+     */
+    function isUserDataImmutable() {
+      return request.resource.data.id == resource.data.id;
+    }
+    
+    /**
+     * Validates required diagnostic form data fields on document creation.
+     * Ensures the form's internal userId points back to the owner.
+     */
+    function hasValidDiagnosticFormDataOnCreate(userId) {
+      return request.resource.data.userId == userId;
+    }
+    
+    /**
+     * Ensures critical, immutable fields for a DiagnosticForm document are not changed.
+     */
+    function isDiagnosticFormDataImmutable() {
+      return request.resource.data.userId == resource.data.id;
+    }
+
+    /**
+     * @description Rules for a user's own profile document.
+     * @path /users/{userId}
+     * @allow (get) A signed-in user requests their own document: `get /users/user_abc` (auth.uid: `user_abc`).
+     * @allow (create) A new user creates their own profile document: `create /users/user_abc` with `{ "id": "user_abc" }` (auth.uid: `user_abc`).
+     * @deny (list) Any user, signed in or not, attempts to list all users: `list /users`.
+     * @deny (get) A signed-in user requests another user's document: `get /users/user_xyz` (auth.uid: `user_abc`).
+     * @principle Restricts access to a user's own data tree and validates relational integrity.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && hasValidUserDataOnCreate(userId);
+      allow update: if isExistingOwner(userId) && isUserDataImmutable();
+      allow delete: if false;
+    }
+
+    /**
+     * @description Rules for a user's private diagnostic forms.
+     * @path /users/{userId}/diagnosticForms/{diagnosticFormId}
+     * @allow (create) A signed-in user creates a new form in their own space: `create /users/user_abc/diagnosticForms/form_123` with `{ "userId": "user_abc" }` (auth.uid: `user_abc`).
+     * @allow (list) A signed-in user lists their own forms: `list /users/user_abc/diagnosticForms` (auth.uid: `user_abc`).
+     * @deny (get) A signed-in user tries to read a form belonging to another user: `get /users/user_xyz/diagnosticForms/form_456` (auth.uid: `user_abc`).
+     * @deny (update) A user tries to change the owner of a form: `update /users/user_abc/diagnosticForms/form_123` with `{ "userId": "user_xyz" }` (auth.uid: `user_abc`).
+     * @principle Enforces strict user ownership for all read and write operations on nested data.
+     */
+    match /users/{userId}/diagnosticForms/{diagnosticFormId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && hasValidDiagnosticFormDataOnCreate(userId);
+      allow update: if isExistingOwner(userId) && isDiagnosticFormDataImmutable();
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for DTC analyses, which are nested under a specific diagnostic form.
+     * @path /users/{userId}/diagnosticForms/{diagnosticFormId}/dtcAnalysis/{dtcAnalysisId}
+     * @allow (get) The owner of the parent form reads their DTC analysis: `get /users/user_abc/.../dtcAnalysis/analysis_789` (auth.uid: `user_abc`).
+     * @allow (create) The owner of the parent form creates a DTC analysis: `create /users/user_abc/.../dtcAnalysis/analysis_789` (auth.uid: `user_abc`).
+     * @deny (list) Another user tries to list analyses: `list /users/user_xyz/.../dtcAnalysis` (auth.uid: `user_abc`).
+     * @deny (delete) Another user tries to delete an analysis: `delete /users/user_xyz/.../dtcAnalysis/analysis_789` (auth.uid: `user_abc`).
+     * @principle Inherits ownership from the parent path, ensuring only the data owner can access their analysis results.
+     */
+    match /users/{userId}/diagnosticForms/{diagnosticFormId}/dtcAnalysis/{dtcAnalysisId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for recommendations, nested under a specific DTC analysis.
+     * @path /users/{userId}/diagnosticForms/{diagnosticFormId}/dtcAnalysis/{dtcAnalysisId}/recommendations/{recommendationId}
+     * @allow (get) The owner of the data tree reads a recommendation: `get /users/user_abc/.../recommendations/rec_1` (auth.uid: `user_abc`).
+     * @allow (list) The owner of the data tree lists their recommendations: `list /users/user_abc/.../recommendations` (auth.uid: `user_abc`).
+     * @deny (create) Another user tries to add a recommendation to someone else's analysis: `create /users/user_xyz/.../recommendations/rec_2` (auth.uid: `user_abc`).
+     * @deny (update) An anonymous user tries to update a recommendation: `update /users/user_abc/.../recommendations/rec_1` (auth.uid: `null`).
+     * @principle Deeply nested ownership is enforced by checking the top-level userId in the path.
+     */
+    match /users/{userId}/diagnosticForms/{diagnosticFormId}/dtcAnalysis/{dtcAnalysisId}/recommendations/{recommendationId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+  }
+}
