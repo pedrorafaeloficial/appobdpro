@@ -52,7 +52,20 @@ const managementQuestions = [
     { id: 'gq8', text: 'A sua oficina tem uma definição clara de missão, visão e valores?', options: ['Sim, e toda a equipe conhece e se guia por eles', 'Temos uma ideia, mas não está formalizado', 'Nunca parei para pensar nisso', 'Acho que isso é para empresas grandes'] },
     { id: 'gq9', text: 'Como você se mantém atualizado sobre as tendências do mercado automotivo e de gestão?', options: ['Participo de feiras, cursos e leio materiais da área', 'Acompanho notícias e converso com colegas', 'Fico sabendo das novidades pelos clientes e fornecedores', 'Não tenho muito tempo para me atualizar'] },
     { id: 'gq10', text: 'Você tem um plano de carreira ou de desenvolvimento para seus funcionários?', options: ['Sim, ofereço oportunidades de crescimento', 'Converso sobre o futuro, mas sem um plano formal', 'Não, o crescimento é limitado na estrutura atual', 'Nunca pensei em um plano de carreira para eles'] },
-];  
+];
+
+const marketingQuestions = [
+    { id: 'mq1', text: 'Como sua oficina atrai novos clientes atualmente?', options: ['Principalmente por indicação (boca a boca)', 'Redes sociais (Instagram, Facebook)', 'Anúncios online (Google, etc.)', 'Ações locais (panfletos, fachada)'] },
+    { id: 'mq2', text: 'Você tem um perfil ativo da sua oficina nas redes sociais?', options: ['Sim, posto conteúdo regularmente', 'Tenho perfil, mas posto raramente', 'Criei o perfil, mas está parado', 'Não tenho perfil nas redes sociais'] },
+    { id: 'mq3', text: 'Você investe algum valor em anúncios pagos (online ou offline)?', options: ['Sim, invisto um valor fixo mensalmente', 'Invisto ocasionalmente, quando sinto necessidade', 'Nunca investi, mas tenho interesse', 'Não invisto e não vejo necessidade'] },
+    { id: 'mq4', text: 'Sua oficina tem uma identidade visual definida (logo, cores)?', options: ['Sim, temos uma marca forte e consistente', 'Temos um logo, mas não usamos de forma padronizada', 'Não temos, usamos apenas o nome', 'Acho que não é importante para meu negócio'] },
+    { id: 'mq5', text: 'Como você se comunica com seus clientes após o serviço?', options: ['Envio lembretes para próximas revisões', 'Peço para avaliarem o serviço', 'Só entro em contato se houver algum problema', 'Não faço contato após a entrega do veículo'] },
+    { id: 'mq6', text: 'Você tem um cadastro de clientes com histórico de serviços?', options: ['Sim, uso um sistema que armazena tudo', 'Tenho uma planilha ou cadastro simples', 'Guardo as ordens de serviço antigas', 'Não tenho um cadastro formal de clientes'] },
+    { id: 'mq7', text: 'Sua oficina oferece algum programa de fidelidade ou promoções?', options: ['Sim, tenho um programa ativo', 'Faço promoções esporadicamente', 'Já pensei nisso, mas nunca implementei', 'Não, não ofereço nenhum benefício'] },
+    { id: 'mq8', text: 'Como você mede a satisfação dos seus clientes?', options: ['Aplico pesquisas de satisfação (NPS, etc.)', 'Pergunto diretamente ao cliente na entrega', 'Me baseio na ausência de reclamações', 'Não tenho um método para medir a satisfação'] },
+    { id: 'mq9', text: 'Seu negócio tem um site ou um Perfil da Empresa no Google atualizado?', options: ['Sim, ambos estão completos e atualizados', 'Tenho apenas um deles atualizado', 'Tenho, mas estão desatualizados', 'Não tenho presença online além de redes sociais'] },
+    { id: 'mq10', text: 'Qual o seu maior desafio em marketing e vendas?', options: ['Atrair clientes novos e qualificados', 'Fidelizar os clientes existentes', 'Divulgar a oficina e ser mais conhecido', 'Converter orçamentos em serviços fechados'] },
+];
 
 const formSchema = z.object({
   oq1: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
@@ -88,10 +101,21 @@ const formSchema = z.object({
   gq9: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
   gq10: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
   managementAdditionalInfo: z.string().optional(),
+  mq1: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  mq2: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  mq3: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  mq4: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  mq5: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  mq6: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  mq7: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  mq8: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  mq9: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  mq10: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  marketingAdditionalInfo: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
-type Step = 'operational' | 'financial' | 'management';
+type Step = 'operational' | 'financial' | 'management' | 'marketing';
 
 interface DiagnosticFormProps {
   onAnalysisComplete: (result: DiagnosticDataOutput, input: DiagnosticDataInput) => void;
@@ -108,16 +132,18 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
         operationalAdditionalInfo: '',
         financialAdditionalInfo: '',
         managementAdditionalInfo: '',
+        marketingAdditionalInfo: '',
     }
   });
 
-  const steps: Step[] = ['operational', 'financial', 'management'];
+  const steps: Step[] = ['operational', 'financial', 'management', 'marketing'];
   const currentStepIndex = steps.indexOf(currentStep);
 
   const handleNext = async () => {
     const operationalFields: (keyof FormData)[] = ['oq1', 'oq2', 'oq3', 'oq4', 'oq5', 'oq6', 'oq7', 'oq8', 'oq9', 'oq10'];
     const financialFields: (keyof FormData)[] = ['fq1', 'fq2', 'fq3', 'fq4', 'fq5', 'fq6', 'fq7', 'fq8', 'fq9', 'fq10'];
     const managementFields: (keyof FormData)[] = ['gq1', 'gq2', 'gq3', 'gq4', 'gq5', 'gq6', 'gq7', 'gq8', 'gq9', 'gq10'];
+    const marketingFields: (keyof FormData)[] = ['mq1', 'mq2', 'mq3', 'mq4', 'mq5', 'mq6', 'mq7', 'mq8', 'mq9', 'mq10'];
 
     let fieldsToValidate: (keyof FormData)[] = [];
     if (currentStep === 'operational') {
@@ -126,6 +152,8 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
         fieldsToValidate = financialFields;
     } else if (currentStep === 'management') {
         fieldsToValidate = managementFields;
+    } else if (currentStep === 'marketing') {
+        fieldsToValidate = marketingFields;
     }
     
     const isValid = await form.trigger(fieldsToValidate);
@@ -164,12 +192,17 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
     ).join('\n\n');
     const finalManagementData = `${managementData}\n\nInformações Adicionais: ${values.managementAdditionalInfo || 'Nenhuma'}`;
 
+    const marketingData = marketingQuestions.map((q, index) =>
+        `Pergunta: ${q.text}\nResposta: ${values[`mq${index + 1}` as keyof FormData]}`
+    ).join('\n\n');
+    const finalMarketingData = `${marketingData}\n\nInformações Adicionais: ${values.marketingAdditionalInfo || 'Nenhuma'}`;
+
 
     const analysisInput: DiagnosticDataInput = {
         operationalData: finalOperationalData,
         financeiroData: finalFinancialData,
         gestaoData: finalManagementData,
-        marketingData: 'N/A'
+        marketingData: finalMarketingData
     }
 
     const result = await runAnalysis(analysisInput);
@@ -195,6 +228,7 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
             {currentStep === 'operational' && <p className="text-muted-foreground text-center">Vamos começar pelo Operacional. Responda às perguntas abaixo.</p>}
             {currentStep === 'financial' && <p className="text-muted-foreground text-center">Agora vamos para o Financeiro. Responda com atenção.</p>}
             {currentStep === 'management' && <p className="text-muted-foreground text-center">Ótimo! Agora vamos falar sobre Gestão.</p>}
+            {currentStep === 'marketing' && <p className="text-muted-foreground text-center">Última etapa! Vamos falar sobre Marketing e Vendas.</p>}
             <Progress value={progressValue} className="w-full mt-4 h-2" />
         </div>
       
@@ -397,6 +431,72 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
               />
             </>
           )}
+
+          {currentStep === 'marketing' && (
+            <>
+              {marketingQuestions.map((q, index) => (
+                <FormField
+                  key={q.id}
+                  control={form.control}
+                  name={`mq${index + 1}` as keyof FormData}
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <Card>
+                        <CardHeader>
+                          <FormLabel className="text-base font-semibold">{index + 1}. {q.text}</FormLabel>
+                        </CardHeader>
+                        <CardContent>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex flex-col space-y-2"
+                            >
+                              {q.options.map(option => (
+                                <FormItem key={option} className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem value={option} />
+                                  </FormControl>
+                                  <FormLabel className="font-normal text-sm">{option}</FormLabel>
+                                </FormItem>
+                              ))}
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </CardContent>
+                      </Card>
+                    </FormItem>
+                  )}
+                />
+              ))}
+              <FormField
+                control={form.control}
+                name="marketingAdditionalInfo"
+                render={({ field }) => (
+                  <FormItem>
+                    <Card>
+                      <CardHeader>
+                        <FormLabel className="text-base font-semibold">Algo mais sobre seu Marketing e Vendas?</FormLabel>
+                        <p className="text-sm text-muted-foreground">
+                          Se houver mais algum detalhe sobre sua estratégia de marketing que queira compartilhar, escreva abaixo.
+                        </p>
+                      </CardHeader>
+                      <CardContent>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Descreva aqui qualquer outro ponto relevante sobre atração de clientes, redes sociais, etc."
+                            className="min-h-[150px]"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </CardContent>
+                    </Card>
+                  </FormItem>
+                )}
+              />
+            </>
+          )}
           
           <div className="flex justify-between mt-8">
             <Button type="button" variant="outline" size="lg" onClick={handleBack} disabled={currentStepIndex === 0 || isLoading}>
@@ -412,5 +512,3 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
     </div>
   );
 }
-
-    
