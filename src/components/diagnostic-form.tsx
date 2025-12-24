@@ -41,6 +41,19 @@ const financialQuestions = [
     { id: 'fq10', text: 'Você utiliza indicadores financeiros (KPIs), como ticket médio, ponto de equilíbrio ou lucratividade?', options: ['Sim, acompanho vários indicadores regularmente', 'Conheço alguns, mas não os calculo sempre', 'Não sei o que são ou como calcular', 'Acho muito complicado para o meu negócio'] },
   ];
 
+const managementQuestions = [
+    { id: 'gq1', text: 'Você tem metas claras e mensuráveis para a sua equipe e para a oficina?', options: ['Sim, temos metas bem definidas para todos', 'Temos algumas metas, mas não são muito formais', 'As metas são mais de faturamento geral', 'Não trabalhamos com metas específicas'] },
+    { id: 'gq2', text: 'Como você avalia o desempenho dos seus funcionários?', options: ['Através de avaliações de desempenho periódicas e feedback', 'Pela observação do dia a dia e resultados gerais', 'Principalmente pelo volume de trabalho que entregam', 'Não tenho um método formal de avaliação'] },
+    { id: 'gq3', text: 'Sua equipe recebe treinamentos e capacitações regularmente?', options: ['Sim, invisto constantemente em treinamento técnico e de gestão', 'Ocasionalmente, quando surge uma nova tecnologia', 'Eles aprendem mais na prática uns com os outros', 'Não, raramente ofereço treinamentos'] },
+    { id: 'gq4', text: 'Como é a comunicação interna na sua equipe?', options: ['Aberta e transparente, com reuniões regulares', 'Boa, mas principalmente informal', 'A comunicação é um pouco falha e gera ruídos', 'É um ponto fraco, cada um trabalha por si'] },
+    { id: 'gq5', text: 'Qual o nível de autonomia que sua equipe tem para tomar decisões?', options: ['Alto, eles têm autonomia para resolver a maioria dos problemas', 'Médio, precisam me consultar para decisões importantes', 'Baixo, a maioria das decisões passa por mim', 'Quase nenhuma, centralizo todas as decisões'] },
+    { id: 'gq6', text: 'Como você lida com conflitos entre membros da equipe?', options: ['Intervenho rapidamente para mediar e resolver', 'Espero que eles se resolvam sozinhos', 'Tento conversar individualmente, mas nem sempre funciona', 'Tenho dificuldade em gerenciar conflitos'] },
+    { id: 'gq7', text: 'Você delega tarefas de gestão ou centraliza tudo em você?', options: ['Delego bastante, confio na minha equipe', 'Delego algumas tarefas, mas as principais ficam comigo', 'Tenho dificuldade em delegar, prefiro fazer eu mesmo', 'Centralizo praticamente todas as decisões e tarefas de gestão'] },
+    { id: 'gq8', text: 'A sua oficina tem uma definição clara de missão, visão e valores?', options: ['Sim, e toda a equipe conhece e se guia por eles', 'Temos uma ideia, mas não está formalizado', 'Nunca parei para pensar nisso', 'Acho que isso é para empresas grandes'] },
+    { id: 'gq9', text: 'Como você se mantém atualizado sobre as tendências do mercado automotivo e de gestão?', options: ['Participo de feiras, cursos e leio materiais da área', 'Acompanho notícias e converso com colegas', 'Fico sabendo das novidades pelos clientes e fornecedores', 'Não tenho muito tempo para me atualizar'] },
+    { id: 'gq10', text: 'Você tem um plano de carreira ou de desenvolvimento para seus funcionários?', options: ['Sim, ofereço oportunidades de crescimento', 'Converso sobre o futuro, mas sem um plano formal', 'Não, o crescimento é limitado na estrutura atual', 'Nunca pensei em um plano de carreira para eles'] },
+];  
+
 const formSchema = z.object({
   oq1: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
   oq2: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
@@ -53,21 +66,32 @@ const formSchema = z.object({
   oq9: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
   oq10: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
   operationalAdditionalInfo: z.string().optional(),
-  fq1: z.string().optional(),
-  fq2: z.string().optional(),
-  fq3: z.string().optional(),
-  fq4: z.string().optional(),
-  fq5: z.string().optional(),
-  fq6: z.string().optional(),
-  fq7: z.string().optional(),
-  fq8: z.string().optional(),
-  fq9: z.string().optional(),
-  fq10: z.string().optional(),
+  fq1: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  fq2: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  fq3: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  fq4: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  fq5: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  fq6: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  fq7: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  fq8: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  fq9: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  fq10: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
   financialAdditionalInfo: z.string().optional(),
+  gq1: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  gq2: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  gq3: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  gq4: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  gq5: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  gq6: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  gq7: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  gq8: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  gq9: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  gq10: z.string({ required_error: 'Por favor, selecione uma resposta.' }),
+  managementAdditionalInfo: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
-type Step = 'operational' | 'financial';
+type Step = 'operational' | 'financial' | 'management';
 
 interface DiagnosticFormProps {
   onAnalysisComplete: (result: DiagnosticDataOutput, input: DiagnosticDataInput) => void;
@@ -82,22 +106,26 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
     resolver: zodResolver(formSchema),
     defaultValues: {
         operationalAdditionalInfo: '',
-        financialAdditionalInfo: ''
+        financialAdditionalInfo: '',
+        managementAdditionalInfo: '',
     }
   });
 
-  const steps: Step[] = ['operational', 'financial'];
+  const steps: Step[] = ['operational', 'financial', 'management'];
   const currentStepIndex = steps.indexOf(currentStep);
 
   const handleNext = async () => {
     const operationalFields: (keyof FormData)[] = ['oq1', 'oq2', 'oq3', 'oq4', 'oq5', 'oq6', 'oq7', 'oq8', 'oq9', 'oq10'];
     const financialFields: (keyof FormData)[] = ['fq1', 'fq2', 'fq3', 'fq4', 'fq5', 'fq6', 'fq7', 'fq8', 'fq9', 'fq10'];
+    const managementFields: (keyof FormData)[] = ['gq1', 'gq2', 'gq3', 'gq4', 'gq5', 'gq6', 'gq7', 'gq8', 'gq9', 'gq10'];
 
     let fieldsToValidate: (keyof FormData)[] = [];
     if (currentStep === 'operational') {
         fieldsToValidate = operationalFields;
     } else if (currentStep === 'financial') {
         fieldsToValidate = financialFields;
+    } else if (currentStep === 'management') {
+        fieldsToValidate = managementFields;
     }
     
     const isValid = await form.trigger(fieldsToValidate);
@@ -131,11 +159,16 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
     ).join('\n\n');
     const finalFinancialData = `${financialData}\n\nInformações Adicionais: ${values.financialAdditionalInfo || 'Nenhuma'}`;
 
+    const managementData = managementQuestions.map((q, index) =>
+        `Pergunta: ${q.text}\nResposta: ${values[`gq${index + 1}` as keyof FormData]}`
+    ).join('\n\n');
+    const finalManagementData = `${managementData}\n\nInformações Adicionais: ${values.managementAdditionalInfo || 'Nenhuma'}`;
+
 
     const analysisInput: DiagnosticDataInput = {
         operationalData: finalOperationalData,
         financeiroData: finalFinancialData,
-        gestaoData: 'N/A',
+        gestaoData: finalManagementData,
         marketingData: 'N/A'
     }
 
@@ -161,6 +194,7 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
             <h2 className="text-3xl font-bold text-center mb-2">Começar o Diagnóstico</h2>
             {currentStep === 'operational' && <p className="text-muted-foreground text-center">Vamos começar pelo Operacional. Responda às perguntas abaixo.</p>}
             {currentStep === 'financial' && <p className="text-muted-foreground text-center">Agora vamos para o Financeiro. Responda com atenção.</p>}
+            {currentStep === 'management' && <p className="text-muted-foreground text-center">Ótimo! Agora vamos falar sobre Gestão.</p>}
             <Progress value={progressValue} className="w-full mt-4 h-2" />
         </div>
       
@@ -297,6 +331,72 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
               />
             </>
           )}
+
+          {currentStep === 'management' && (
+            <>
+              {managementQuestions.map((q, index) => (
+                <FormField
+                  key={q.id}
+                  control={form.control}
+                  name={`gq${index + 1}` as keyof FormData}
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <Card>
+                        <CardHeader>
+                          <FormLabel className="text-base font-semibold">{index + 1}. {q.text}</FormLabel>
+                        </CardHeader>
+                        <CardContent>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex flex-col space-y-2"
+                            >
+                              {q.options.map(option => (
+                                <FormItem key={option} className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem value={option} />
+                                  </FormControl>
+                                  <FormLabel className="font-normal text-sm">{option}</FormLabel>
+                                </FormItem>
+                              ))}
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </CardContent>
+                      </Card>
+                    </FormItem>
+                  )}
+                />
+              ))}
+              <FormField
+                control={form.control}
+                name="managementAdditionalInfo"
+                render={({ field }) => (
+                  <FormItem>
+                    <Card>
+                      <CardHeader>
+                        <FormLabel className="text-base font-semibold">Algo mais sobre sua gestão?</FormLabel>
+                        <p className="text-sm text-muted-foreground">
+                          Se houver mais algum detalhe sobre sua gestão de pessoas ou processos que queira compartilhar, escreva abaixo.
+                        </p>
+                      </CardHeader>
+                      <CardContent>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Descreva aqui qualquer outro ponto relevante sobre liderança, equipe, metas, etc."
+                            className="min-h-[150px]"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </CardContent>
+                    </Card>
+                  </FormItem>
+                )}
+              />
+            </>
+          )}
           
           <div className="flex justify-between mt-8">
             <Button type="button" variant="outline" size="lg" onClick={handleBack} disabled={currentStepIndex === 0 || isLoading}>
@@ -312,3 +412,5 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
     </div>
   );
 }
+
+    
