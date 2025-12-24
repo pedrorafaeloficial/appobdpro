@@ -16,14 +16,14 @@ export default function LandingPage({ onStart }: LandingPageProps) {
       </div>
       <div className="max-w-2xl">
         <h2 className="text-4xl md:text-5xl font-bold tracking-tighter mb-4">
-          AI-Powered Business Diagnostics
+          Diagnóstico Empresarial com Inteligência Artificial
         </h2>
         <p className="text-lg text-muted-foreground">
-          Identify issues, get actionable insights, and drive your business forward. Like a diagnostic scanner for your company.
+          Identifique problemas, obtenha insights acionáveis e impulsione seu negócio. Como um scanner de diagnóstico para sua empresa.
         </p>
       </div>
       <Button onClick={onStart} size="lg" className="text-lg font-bold tracking-wider">
-        Start Diagnostic
+        Iniciar Diagnóstico
       </Button>
     </div>
   );

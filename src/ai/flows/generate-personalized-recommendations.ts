@@ -1,28 +1,28 @@
 'use server';
 
 /**
- * @fileOverview Generates personalized recommendations based on diagnostic data.
+ * @fileOverview Gera recomendações personalizadas com base nos dados de diagnóstico.
  *
- * - generatePersonalizedRecommendations - A function that generates personalized recommendations.
- * - PersonalizedRecommendationsInput - The input type for the generatePersonalizedRecommendations function.
- * - PersonalizedRecommendationsOutput - The return type for the generatePersonalizedRecommendations function.
+ * - generatePersonalizedRecommendations - Uma função que gera recomendações personalizadas.
+ * - PersonalizedRecommendationsInput - O tipo de entrada para a função generatePersonalizedRecommendations.
+ * - PersonalizedRecommendationsOutput - O tipo de retorno para a função generatePersonalizedRecommendations.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const PersonalizedRecommendationsInputSchema = z.object({
-  operationalData: z.string().describe('Data collected from the operational area of the diagnostic form.'),
-  gestaoData: z.string().describe('Data collected from the gestão (management) area of the diagnostic form.'),
-  financeiroData: z.string().describe('Data collected from the financeiro (financial) area of the diagnostic form.'),
-  marketingData: z.string().describe('Data collected from the marketing area of the diagnostic form.'),
-  identifiedDTCs: z.string().describe('A list of identified DTCs (Error Codes) in each area.'),
+  operationalData: z.string().describe('Dados coletados da área operacional do formulário de diagnóstico.'),
+  gestaoData: z.string().describe('Dados coletados da área de gestão do formulário de diagnóstico.'),
+  financeiroData: z.string().describe('Dados coletados da área financeira do formulário de diagnóstico.'),
+  marketingData: z.string().describe('Dados coletados da área de marketing do formulário de diagnóstico.'),
+  identifiedDTCs: z.string().describe('Uma lista de DTCs (Códigos de Erro) identificados em cada área.'),
 });
 
 export type PersonalizedRecommendationsInput = z.infer<typeof PersonalizedRecommendationsInputSchema>;
 
 const PersonalizedRecommendationsOutputSchema = z.object({
-  report: z.string().describe('A complete report with tailored recommendations to address the identified DTCs and improve overall business performance, including guidance on how to resolve them and links to community training resources.'),
+  report: z.string().describe('Um relatório completo com recomendações personalizadas para abordar os DTCs identificados e melhorar o desempenho geral do negócio, incluindo orientação sobre como resolvê-los e links para recursos de treinamento da comunidade.'),
 });
 
 export type PersonalizedRecommendationsOutput = z.infer<typeof PersonalizedRecommendationsOutputSchema>;
@@ -35,17 +35,17 @@ const prompt = ai.definePrompt({
   name: 'personalizedRecommendationsPrompt',
   input: {schema: PersonalizedRecommendationsInputSchema},
   output: {schema: PersonalizedRecommendationsOutputSchema},
-  prompt: `You are an AI assistant designed to provide personalized recommendations to business owners based on diagnostic data.
+  prompt: `Você é um assistente de IA projetado para fornecer recomendações personalizadas a proprietários de empresas com base em dados de diagnóstico.
 
-  Analyze the following diagnostic data collected from the business owner in the areas of operational, gestão (management), financeiro (financial), and marketing. Also included is a list of identified DTCs (Error Codes) in each area.
+  Analise os seguintes dados de diagnóstico coletados do proprietário da empresa nas áreas de operacional, gestão, financeiro e marketing. Também está incluída uma lista de DTCs (Códigos de Erro) identificados em cada área.
 
-  Operational Data: {{{operationalData}}}
-  Gestão Data: {{{gestaoData}}}
-  Financeiro Data: {{{financeiroData}}}
-  Marketing Data: {{{marketingData}}}
-  Identified DTCs: {{{identifiedDTCs}}}
+  Dados Operacionais: {{{operationalData}}}
+  Dados de Gestão: {{{gestaoData}}}
+  Dados Financeiros: {{{financeiroData}}}
+  Dados de Marketing: {{{marketingData}}}
+  DTCs Identificados: {{{identifiedDTCs}}}
 
-  Based on this information, create a comprehensive report with tailored recommendations to address the identified DTCs and improve overall business performance. For all generated errors, show how to resolve them, and point users to the OBD-Pro community for complete training. Be concise and actionable.
+  Com base nessas informações, crie um relatório abrangente com recomendações personalizadas para resolver os DTCs identificados e melhorar o desempenho geral do negócio. Para todos os erros gerados, mostre como resolvê-los e aponte os usuários para a comunidade OBD-Pro para treinamento completo. Seja conciso e acionável.
   `,
 });
 

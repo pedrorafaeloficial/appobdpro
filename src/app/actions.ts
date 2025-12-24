@@ -9,7 +9,7 @@ export async function runAnalysis(input: DiagnosticDataInput) {
     return { success: true, data: result };
   } catch (error) {
     console.error('Error running AI analysis:', error);
-    return { success: false, error: 'Failed to analyze data. Please try again.' };
+    return { success: false, error: 'Falha ao analisar os dados. Por favor, tente novamente.' };
   }
 }
 
@@ -19,6 +19,6 @@ export async function getFullReport(input: PersonalizedRecommendationsInput) {
     return { success: true, data: result };
   } catch (error) {
     console.error('Error generating full report:', error);
-    return { success: false, error: 'Failed to generate report. Please try again.' };
+    return { success: false, error: 'Falha ao gerar o relatório. Por favor, tente novamente.' };
   }
 }

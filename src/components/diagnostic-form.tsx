@@ -14,10 +14,10 @@ import type { DiagnosticDataOutput, DiagnosticDataInput } from '@/ai/flows/analy
 import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
-  operationalData: z.string().min(10, { message: 'Please provide some details about your operations.' }),
-  gestaoData: z.string().min(10, { message: 'Please provide some details about your management.' }),
-  financeiroData: z.string().min(10, { message: 'Please provide some details about your financials.' }),
-  marketingData: z.string().min(10, { message: 'Please provide some details about your marketing.' }),
+  operationalData: z.string().min(10, { message: 'Por favor, forneça alguns detalhes sobre suas operações.' }),
+  gestaoData: z.string().min(10, { message: 'Por favor, forneça alguns detalhes sobre sua gestão.' }),
+  financeiroData: z.string().min(10, { message: 'Por favor, forneça alguns detalhes sobre suas finanças.' }),
+  marketingData: z.string().min(10, { message: 'Por favor, forneça alguns detalhes sobre seu marketing.' }),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -27,10 +27,10 @@ interface DiagnosticFormProps {
 }
 
 const formTabs = [
-  { value: 'operational', label: 'Operational', field: 'operationalData', description: 'Describe your production processes, logistics, quality control, and day-to-day operations.' },
-  { value: 'gestao', label: 'Gestão', field: 'gestaoData', description: 'Describe your team structure, management style, internal communication, and HR processes.' },
-  { value: 'financeiro', label: 'Financeiro', field: 'financeiroData', description: 'Describe your cash flow, pricing, profitability, and financial controls.' },
-  { value: 'marketing', label: 'Marketing', field: 'marketingData', description: 'Describe your sales strategies, customer acquisition, branding, and online presence.' },
+  { value: 'operational', label: 'Operacional', field: 'operationalData', description: 'Descreva seus processos de produção, logística, controle de qualidade e operações do dia-a-dia.' },
+  { value: 'gestao', label: 'Gestão', field: 'gestaoData', description: 'Descreva a estrutura da sua equipe, estilo de gestão, comunicação interna e processos de RH.' },
+  { value: 'financeiro', label: 'Financeiro', field: 'financeiroData', description: 'Descreva seu fluxo de caixa, precificação, lucratividade e controles financeiros.' },
+  { value: 'marketing', label: 'Marketing', field: 'marketingData', description: 'Descreva suas estratégias de vendas, aquisição de clientes, branding e presença online.' },
 ] as const;
 
 
@@ -57,16 +57,16 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
     } else {
       toast({
         variant: 'destructive',
-        title: 'Analysis Failed',
-        description: result.error || 'An unknown error occurred.',
+        title: 'Falha na Análise',
+        description: result.error || 'Ocorreu um erro desconhecido.',
       });
     }
   }
 
   return (
     <div className="w-full max-w-4xl mx-auto animate-fade-in">
-      <h2 className="text-3xl font-bold text-center mb-2">Business Diagnostic</h2>
-      <p className="text-muted-foreground text-center mb-8">Fill in the details for each area of your business.</p>
+      <h2 className="text-3xl font-bold text-center mb-2">Diagnóstico Empresarial</h2>
+      <p className="text-muted-foreground text-center mb-8">Preencha os detalhes para cada área do seu negócio.</p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Tabs defaultValue="operational" className="w-full">
@@ -89,7 +89,7 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
                           </FormDescription>
                           <FormControl>
                             <Textarea
-                              placeholder={`e.g., "Our production line has frequent bottlenecks..."`}
+                              placeholder={`Ex: "Nossa linha de produção tem gargalos frequentes..."`}
                               className="min-h-[200px] text-base"
                               {...field}
                             />
@@ -105,7 +105,7 @@ export default function DiagnosticForm({ onAnalysisComplete }: DiagnosticFormPro
           <div className="flex justify-end mt-8">
             <Button type="submit" size="lg" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Analyze Data
+              Analisar Dados
             </Button>
           </div>
         </form>

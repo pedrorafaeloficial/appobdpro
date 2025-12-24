@@ -1,30 +1,30 @@
 'use server';
 
 /**
- * @fileOverview Analyzes diagnostic data and suggests DTCs (Diagnostic Trouble Codes) for various business areas.
+ * @fileOverview Analisa dados de diagnóstico e sugere DTCs (Códigos de Falha de Diagnóstico) para várias áreas de negócio.
  *
- * - analyzeDiagnosticData - A function that analyzes diagnostic data and returns potential DTCs and recommendations.
- * - DiagnosticDataInput - The input type for the analyzeDiagnosticData function.
- * - DiagnosticDataOutput - The return type for the analyzeDiagnosticData function.
+ * - analyzeDiagnosticData - Uma função que analisa dados de diagnóstico e retorna potenciais DTCs e recomendações.
+ * - DiagnosticDataInput - O tipo de entrada para a função analyzeDiagnosticData.
+ * - DiagnosticDataOutput - O tipo de retorno para a função analyzeDiagnosticData.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const DiagnosticDataInputSchema = z.object({
-  operationalData: z.string().describe('Data related to the operational area of the business.'),
-  gestaoData: z.string().describe('Data related to the gestão (management) area of the business.'),
-  financeiroData: z.string().describe('Data related to the financeiro (financial) area of the business.'),
-  marketingData: z.string().describe('Data related to the marketing area of the business.'),
+  operationalData: z.string().describe('Dados relacionados à área operacional do negócio.'),
+  gestaoData: z.string().describe('Dados relacionados à área de gestão do negócio.'),
+  financeiroData: z.string().describe('Dados relacionados à área financeira do negócio.'),
+  marketingData: z.string().describe('Dados relacionados à área de marketing do negócio.'),
 });
 export type DiagnosticDataInput = z.infer<typeof DiagnosticDataInputSchema>;
 
 const DiagnosticDataOutputSchema = z.object({
-  operationalDTCs: z.string().describe('Potential DTCs (Error Codes) identified in the operational area.'),
-  gestaoDTCs: z.string().describe('Potential DTCs identified in the gestão (management) area.'),
-  financeiroDTCs: z.string().describe('Potential DTCs identified in the financeiro (financial) area.'),
-  marketingDTCs: z.string().describe('Potential DTCs identified in the marketing area.'),
-  recommendations: z.string().describe('Tailored recommendations to address the identified DTCs and improve overall business performance, with links to the OBD-Pro community.'),
+  operationalDTCs: z.string().describe('Potenciais DTCs (Códigos de Erro) identificados na área operacional.'),
+  gestaoDTCs: z.string().describe('Potenciais DTCs identificados na área de gestão.'),
+  financeiroDTCs: z.string().describe('Potenciais DTCs identificados na área financeira.'),
+  marketingDTCs: z.string().describe('Potenciais DTCs identificados na área de marketing.'),
+  recommendations: z.string().describe('Recomendações personalizadas para abordar os DTCs identificados e melhorar o desempenho geral do negócio, com links para a comunidade OBD-Pro.'),
 });
 export type DiagnosticDataOutput = z.infer<typeof DiagnosticDataOutputSchema>;
 
@@ -36,14 +36,14 @@ const prompt = ai.definePrompt({
   name: 'analyzeDiagnosticDataPrompt',
   input: {schema: DiagnosticDataInputSchema},
   output: {schema: DiagnosticDataOutputSchema},
-  prompt: `You are an AI expert in business diagnostics. Analyze the data provided from a business diagnostic form and identify potential DTCs (Error Codes) in each area (Operational, Gestão (Management), Financeiro (Financial), and Marketing). Provide tailored recommendations to address the identified DTCs and improve overall business performance. For all generated errors, show how to resolve them, and point users to the OBD-Pro community for complete training.
+  prompt: `Você é um especialista em diagnósticos de negócios de IA. Analise os dados fornecidos de um formulário de diagnóstico de negócios e identifique potenciais DTCs (Códigos de Erro) em cada área (Operacional, Gestão, Financeiro e Marketing). Forneça recomendações personalizadas para resolver os DTCs identificados e melhorar o desempenho geral do negócio. Para todos os erros gerados, mostre como resolvê-los e aponte os usuários para a comunidade OBD-Pro para treinamento completo.
 
-Operational Data: {{{operationalData}}}
-Gestão Data: {{{gestaoData}}}
-Financeiro Data: {{{financeiroData}}}
-Marketing Data: {{{marketingData}}}
+Dados Operacionais: {{{operationalData}}}
+Dados de Gestão: {{{gestaoData}}}
+Dados Financeiros: {{{financeiroData}}}
+Dados de Marketing: {{{marketingData}}}
 
-Respond with potential DTCs and recommendations for each of the areas.`,
+Responda com potenciais DTCs e recomendações para cada uma das áreas.`,
 });
 
 const analyzeDiagnosticDataFlow = ai.defineFlow(

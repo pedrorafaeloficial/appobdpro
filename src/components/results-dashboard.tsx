@@ -26,17 +26,17 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
   const { toast } = useToast();
 
   const chartData = [
-    { name: 'Operational', issues: analysisResult.operationalDTCs.split('\n').filter(line => line.trim() !== '').length },
+    { name: 'Operacional', issues: analysisResult.operationalDTCs.split('\n').filter(line => line.trim() !== '').length },
     { name: 'Gestão', issues: analysisResult.gestaoDTCs.split('\n').filter(line => line.trim() !== '').length },
     { name: 'Financeiro', issues: analysisResult.financeiroDTCs.split('\n').filter(line => line.trim() !== '').length },
     { name: 'Marketing', issues: analysisResult.marketingDTCs.split('\n').filter(line => line.trim() !== '').length },
   ].filter(d => d.issues > 0);
   
   const diagnosticSections = [
-    { title: 'Operational DTCs', content: analysisResult.operationalDTCs },
-    { title: 'Gestão DTCs', content: analysisResult.gestaoDTCs },
-    { title: 'Financeiro DTCs', content: analysisResult.financeiroDTCs },
-    { title: 'Marketing DTCs', content: analysisResult.marketingDTCs },
+    { title: 'DTCs Operacionais', content: analysisResult.operationalDTCs },
+    { title: 'DTCs de Gestão', content: analysisResult.gestaoDTCs },
+    { title: 'DTCs Financeiros', content: analysisResult.financeiroDTCs },
+    { title: 'DTCs de Marketing', content: analysisResult.marketingDTCs },
   ];
 
   const handleGenerateReport = async () => {
@@ -54,8 +54,8 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
     } else {
       toast({
         variant: 'destructive',
-        title: 'Report Generation Failed',
-        description: result.error || 'An unknown error occurred.',
+        title: 'Falha na Geração do Relatório',
+        description: result.error || 'Ocorreu um erro desconhecido.',
       });
     }
   };
@@ -67,13 +67,13 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
   return (
     <div className="w-full max-w-7xl mx-auto animate-fade-in printable-area">
       <div className="flex flex-wrap justify-between items-center gap-4 mb-8 non-printable">
-        <h2 className="text-3xl font-bold">Diagnostic Results</h2>
+        <h2 className="text-3xl font-bold">Resultados do Diagnóstico</h2>
         <div className="flex gap-2">
           <Button variant="outline" onClick={onStartOver}>
-            <RotateCcw className="mr-2 h-4 w-4" /> Start Over
+            <RotateCcw className="mr-2 h-4 w-4" /> Começar de Novo
           </Button>
           <Button onClick={handlePrint}>
-            <Printer className="mr-2 h-4 w-4" /> Print Report
+            <Printer className="mr-2 h-4 w-4" /> Imprimir Relatório
           </Button>
         </div>
       </div>
@@ -88,7 +88,7 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <pre className="whitespace-pre-wrap font-body text-sm bg-background p-4 rounded-md">{section.content || 'No issues detected.'}</pre>
+                <pre className="whitespace-pre-wrap font-body text-sm bg-background p-4 rounded-md">{section.content || 'Nenhum problema detectado.'}</pre>
               </CardContent>
             </Card>
           ))}
@@ -97,8 +97,8 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Issues Overview</CardTitle>
-              <CardDescription>Number of potential issues identified per area.</CardDescription>
+              <CardTitle>Visão Geral dos Problemas</CardTitle>
+              <CardDescription>Número de problemas potenciais identificados por área.</CardDescription>
             </CardHeader>
             <CardContent>
               {chartData.length > 0 ? (
@@ -114,14 +114,14 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-muted-foreground text-center py-10">No issues to display.</p>
+                <p className="text-muted-foreground text-center py-10">Nenhum problema para exibir.</p>
               )}
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader>
-              <CardTitle>Initial Recommendations</CardTitle>
+              <CardTitle>Recomendações Iniciais</CardTitle>
             </CardHeader>
             <CardContent>
                <ScrollArea className="h-48">
@@ -134,15 +134,15 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
             <DialogTrigger asChild>
               <Button size="lg" className="w-full" onClick={handleGenerateReport} disabled={isGeneratingReport}>
                 {isGeneratingReport ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
-                {isGeneratingReport ? 'Generating...' : (fullReport ? 'View Full Report' : 'Generate Full Report')}
+                {isGeneratingReport ? 'Gerando...' : (fullReport ? 'Ver Relatório Completo' : 'Gerar Relatório Completo')}
               </Button>
             </DialogTrigger>
             {fullReport && (
               <DialogContent className="max-w-4xl h-[90vh]">
                 <DialogHeader>
-                  <DialogTitle>Complete Diagnostic Report</DialogTitle>
+                  <DialogTitle>Relatório de Diagnóstico Completo</DialogTitle>
                   <DialogDescription>
-                    Here is your detailed report with personalized recommendations.
+                    Aqui está seu relatório detalhado com recomendações personalizadas.
                   </DialogDescription>
                 </DialogHeader>
                 <ScrollArea className="h-full w-full rounded-md border p-4 mt-4">
