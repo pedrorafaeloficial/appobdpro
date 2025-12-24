@@ -9,6 +9,7 @@ const Logo: FC = () => {
       width={150}
       height={35}
       priority
+      unoptimized
     />
   );
 };
