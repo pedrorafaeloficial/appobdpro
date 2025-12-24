@@ -72,7 +72,7 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
           <Button variant="outline" onClick={onStartOver}>
             <RotateCcw className="mr-2 h-4 w-4" /> Começar de Novo
           </Button>
-          <Button onClick={handlePrint}>
+          <Button onClick={handlePrint} disabled={!fullReport}>
             <Printer className="mr-2 h-4 w-4" /> Imprimir Relatório
           </Button>
         </div>
@@ -108,7 +108,7 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
                     <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
                     <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
                     <RechartsTooltip cursor={{ fill: 'hsl(var(--muted))' }} contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }} />
-                    <Bar dataKey="issues" fill="var(--color-chart-1)" radius={[4, 4, 0, 0]}>
+                    <Bar dataKey="issues" fill="hsl(var(--primary))">
                       <LabelList dataKey="issues" position="top" style={{ fill: 'hsl(var(--foreground))' }} />
                     </Bar>
                   </BarChart>
@@ -138,7 +138,7 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
               </Button>
             </DialogTrigger>
             {fullReport && (
-              <DialogContent className="max-w-4xl h-[90vh]">
+              <DialogContent className="max-w-4xl h-[90vh] printable-dialog-content">
                 <DialogHeader>
                   <DialogTitle>Relatório de Diagnóstico Completo</DialogTitle>
                   <DialogDescription>
@@ -160,46 +160,34 @@ export default function ResultsDashboard({ analysisResult, onStartOver }: Result
           body * {
             visibility: hidden;
           }
-          .printable-area, .printable-area * {
+          .printable-dialog-content, .printable-dialog-content * {
             visibility: visible;
           }
-          .printable-area {
+          .printable-dialog-content {
             position: absolute;
             left: 0;
             top: 0;
             width: 100%;
+            height: 100%;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            border: none !important;
+            box-shadow: none !important;
+            background: white !important;
           }
           .non-printable {
             display: none !important;
           }
-          body {
+           body, .printable-dialog-content {
             background-color: white !important;
             color: black !important;
           }
-          .printable-area {
-            color: black;
-          }
-          .printable-area .bg-card, .printable-area .bg-background {
-             background-color: white !important;
-             border: 1px solid #ddd !important;
-             box-shadow: none !important;
-          }
-          .printable-area pre, .printable-area .text-muted-foreground, .printable-area p {
+           .printable-dialog-content pre, .printable-dialog-content p, .printable-dialog-content .dialog-description {
             color: #333 !important;
           }
-          .printable-area .text-primary {
-            color: #cc0000 !important;
-          }
-           .printable-area h1, .printable-area h2, .printable-area h3, .printable-area h4, .printable-area .card-title {
+           .printable-dialog-content h1, .printable-dialog-content h2, .printable-dialog-content h3, .printable-dialog-content .dialog-title {
             color: black !important;
           }
-           .printable-area .recharts-wrapper {
-             -webkit-print-color-adjust: exact !important;
-             print-color-adjust: exact !important;
-           }
-           .printable-area [fill="var(--color-chart-1)"] {
-             fill: #e53e3e !important;
-           }
         }
       `}</style>
     </div>
